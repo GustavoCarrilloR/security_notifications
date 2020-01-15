@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "862882260033",
+    "firebase_url": "https://security-notification-1b418.firebaseio.com",
+    "project_id": "security-notification-1b418",
+    "storage_bucket": "security-notification-1b418.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:862882260033:android:3b493182d3f78a7f3e52c0",
+        "android_client_info": {
+          "package_name": "pe.com.celstren.security_notifications"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "862882260033-70krqkft59mcq5omkn9hlc9frrl1pc9q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXnDmlozJrXvy6M3EB6t3-JKizm1_XO8o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "862882260033-70krqkft59mcq5omkn9hlc9frrl1pc9q.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

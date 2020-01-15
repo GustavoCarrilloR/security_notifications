@@ -1,0 +1,1 @@
+enum NotificationEnum { EMPLOYEE_NOTIFICATION, }
