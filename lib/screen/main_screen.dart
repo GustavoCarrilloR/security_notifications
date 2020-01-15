@@ -184,6 +184,10 @@ class _MainScreenState extends State<MainScreen>
                             notificationType: "Message",
                           ),
                           NotificationIcon(
+                            key: mapNotificationKey,
+                            notificationType: "Map",
+                          ),
+                          NotificationIcon(
                             key: busNotificationKey,
                             notificationType: "Business",
                           ),
