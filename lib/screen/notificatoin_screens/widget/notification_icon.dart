@@ -3,10 +3,12 @@ import 'package:security_notifications/screen/notificatoin_screens/general_notif
 
 class NotificationIcon extends StatefulWidget {
   final String notificationType;
+  final double iconSize;
 
   const NotificationIcon({
     Key key,
     this.notificationType = "",
+    this.iconSize = 40,
   }) : super(key: key);
 
   @override
@@ -14,12 +16,16 @@ class NotificationIcon extends StatefulWidget {
 }
 
 class NotificationIconState extends State<NotificationIcon>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   AnimationController _animationController;
   Animation<double> _animation;
+
+  AnimationController _bellAnimationController;
+  Animation<double> _bellAnimation;
+
   int _notificationQty = 0;
   IconData _iconData = Icons.notifications;
-  Color _color = Colors.yellow;
+  Color _backgroundColor = Colors.orange;
   String _notificationTitle = "", _notificationBody = "";
 
   @override
@@ -30,6 +36,12 @@ class NotificationIconState extends State<NotificationIcon>
       duration: Duration(milliseconds: 500),
       vsync: this,
     );
+
+    _bellAnimationController = AnimationController(
+      duration: Duration(milliseconds: 200),
+      vsync: this,
+    );
+
     setNotificationData();
   }
 
@@ -37,27 +49,23 @@ class NotificationIconState extends State<NotificationIcon>
     switch (widget.notificationType) {
       case "Employee":
         _iconData = Icons.person;
-        _color = Colors.green;
+        _backgroundColor = Colors.green;
         break;
       case "Mail":
         _iconData = Icons.mail;
-        _color = Colors.redAccent;
+        _backgroundColor = Colors.red;
         break;
       case "General":
         _iconData = Icons.notifications;
-        _color = Colors.yellowAccent;
+        _backgroundColor = Colors.amber;
         break;
       case "Message":
         _iconData = Icons.message;
-        _color = Colors.lightBlueAccent;
-        break;
-      case "Map":
-        _iconData = Icons.map;
-        _color = Colors.deepOrangeAccent;
+        _backgroundColor = Colors.blueAccent;
         break;
       case "Business":
         _iconData = Icons.business;
-        _color = Colors.grey;
+        _backgroundColor = Colors.black54;
         break;
     }
   }
@@ -92,7 +100,7 @@ class NotificationIconState extends State<NotificationIcon>
       ..addStatusListener((status) {
         if (status == AnimationStatus.completed) {
           _animationController.reverse();
-        } else if (status == AnimationStatus.dismissed) {}
+        }
       });
 
     _animationController.forward();
@@ -105,9 +113,33 @@ class NotificationIconState extends State<NotificationIcon>
         builder: (context) => GeneralNotificationScreen(
           notificationTitle: _notificationTitle,
           notificationBody: _notificationBody,
+          notificationType: widget.notificationType,
         ),
       ),
     );
+  }
+
+  void animateBell() {
+    final CurvedAnimation curvedAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.bounceIn,
+      reverseCurve: Curves.easeOut,
+    );
+
+    _bellAnimation = Tween<double>(
+      begin: 0,
+      end: 10,
+    ).animate(curvedAnimation)
+      ..addListener(() {
+        setState(() {});
+      })
+      ..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          _bellAnimationController.reverse();
+        }
+      });
+
+    _bellAnimationController.forward();
   }
 
   @override
@@ -120,7 +152,13 @@ class NotificationIconState extends State<NotificationIcon>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: seeNotification,
+      onTap: () {
+        if (widget.notificationType == "General") {
+          animateBell();
+        } else {
+          seeNotification();
+        }
+      },
       child: Container(
         child: Stack(
           children: <Widget>[
@@ -132,17 +170,43 @@ class NotificationIconState extends State<NotificationIcon>
                     : 0,
               ),
               child: Center(
-                child: Icon(
-                  _iconData,
-                  color: _color,
-                  size: 75,
+                child: Container(
+                  height: 100,
+                  width: 80,
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        padding: EdgeInsets.all(15),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: _backgroundColor,
+                        ),
+                        child: Icon(
+                          _iconData,
+                          color: Colors.white,
+                          size: widget.iconSize,
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 5),
+                        child: Text(
+                          widget.notificationType,
+                          style: TextStyle(
+                            fontFamily: "Lato",
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
             _notificationQty > 0
                 ? Container(
-                    height: 75,
-                    width: 75,
+                    height: 100,
+                    width: 80,
                     child: Align(
                       alignment: Alignment.topRight,
                       child: Container(
@@ -150,13 +214,18 @@ class NotificationIconState extends State<NotificationIcon>
                         width: 20,
                         decoration: BoxDecoration(
                           color: Colors.red,
-                          borderRadius: BorderRadius.all(Radius.circular(2)),
+                          borderRadius: BorderRadius.all(Radius.circular(3)),
                         ),
                         child: Center(
                           child: Text(
                             "$_notificationQty",
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.white),
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontFamily: "Lato",
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
                       ),

@@ -1,3 +1,4 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:security_notifications/screen/notificatoin_screens/widget/notification_icon.dart';
@@ -10,8 +11,6 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen>
     with SingleTickerProviderStateMixin {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
-  AnimationController controller;
-  Animation<double> animation;
 
   final GlobalKey<NotificationIconState> empNotificationKey =
       GlobalKey<NotificationIconState>();
@@ -26,20 +25,13 @@ class _MainScreenState extends State<MainScreen>
   final GlobalKey<NotificationIconState> busNotificationKey =
       GlobalKey<NotificationIconState>();
 
-  void initialAnimation() {
-    controller =
-        AnimationController(duration: Duration(seconds: 1), vsync: this);
-
-    animation = Tween<double>(
-      begin: 0.00,
-      end: 1.00,
-    ).animate(controller)
-      ..addListener(() {
-        setState(() {});
-      });
-
-    controller.forward();
-  }
+  List<String> images = [
+    "assets/images/first.jpg",
+    "assets/images/second.jpg",
+    "assets/images/third.jpg",
+    "assets/images/fourth.jpg",
+    "assets/images/fifth.jpg",
+  ];
 
   void listenNotifications() {
     _firebaseMessaging.configure(
@@ -116,7 +108,6 @@ class _MainScreenState extends State<MainScreen>
   void initState() {
     // TODO: implement initState
     super.initState();
-    initialAnimation();
     listenNotifications();
   }
 
@@ -124,78 +115,214 @@ class _MainScreenState extends State<MainScreen>
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: Container(
-          child: Row(
-            children: <Widget>[
-              Flexible(
-                fit: FlexFit.tight,
-                child: Opacity(
-                  opacity: animation != null && animation.value != null
-                      ? animation.value
-                      : 0.00,
-                  child: Align(
-                    alignment: Alignment(
-                        animation != null && animation.value != null
-                            ? -1.00 + animation.value
-                            : -1.00,
-                        0.00),
-                    child: Container(
-                      width: 80,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          NotificationIcon(
-                            key: empNotificationKey,
-                            notificationType: "Employee",
-                          ),
-                          NotificationIcon(
-                            key: mailNotificationKey,
-                            notificationType: "Mail",
-                          ),
-                          NotificationIcon(
-                            key: generalNotificationKey,
-                            notificationType: "General",
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+        appBar: AppBar(
+          centerTitle: true,
+          title: Text(
+            "Security Notifications",
+            style: TextStyle(
+              fontFamily: "Lato",
+            ),
+          ),
+          actions: <Widget>[
+            Container(
+              child: CircleAvatar(
+                backgroundColor: Colors.transparent,
+                child: Icon(
+                  Icons.account_circle,
+                  color: Colors.white,
+                  size: 30,
                 ),
               ),
-              Flexible(
-                fit: FlexFit.tight,
-                child: Opacity(
-                  opacity: animation != null && animation.value != null
-                      ? animation.value
-                      : 0.00,
-                  child: Align(
-                    alignment: Alignment(
-                        animation != null && animation.value != null
-                            ? 1 - animation.value
-                            : 1.00,
-                        0.00),
-                    child: Container(
-                      width: 80,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          NotificationIcon(
-                            key: messNotificationKey,
-                            notificationType: "Message",
-                          ),
-                          NotificationIcon(
-                            key: busNotificationKey,
-                            notificationType: "Business",
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+            ),
+          ],
+        ),
+        drawer: Drawer(),
+        body: Container(
+          padding: EdgeInsets.only(bottom: 20),
+          child: SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                _title,
+                _searchBox,
+                _notificationButtons(),
+                _notificationBoardTitle,
+                _notificationBoard(),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _title = Container(
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: <Widget>[
+        Container(
+          margin: EdgeInsets.only(top: 10, bottom: 10, left: 25),
+          child: Text(
+            "Check what's new today!",
+            style: TextStyle(
+              fontFamily: "Lato",
+              fontSize: 15,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+
+  Widget _searchBox = Container(
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Container(
+          width: 350,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(
+              color: Colors.black87,
+              width: .1,
+            ),
+            borderRadius: BorderRadius.all(new Radius.circular(30)),
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                color: Colors.black26,
+                offset: Offset(1.0, 2.0),
+                blurRadius: 2.0,
               ),
             ],
           ),
+          padding: EdgeInsets.symmetric(
+            horizontal: 15,
+          ),
+          child: TextField(
+            style: TextStyle(
+              fontFamily: "Lato",
+              fontSize: 15,
+              fontWeight: FontWeight.w400,
+            ),
+            decoration: InputDecoration(
+              hintText: "Search by Topic",
+              hintStyle: TextStyle(
+                fontFamily: "Lato",
+                fontSize: 15,
+                fontWeight: FontWeight.w300,
+              ),
+              border: InputBorder.none,
+              suffixIcon: Icon(
+                Icons.search,
+                size: 25,
+              ),
+            ),
+          ),
         ),
+      ],
+    ),
+  );
+
+  Widget _notificationButtons() {
+    return Container(
+      margin: EdgeInsets.only(bottom: 10, top: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          NotificationIcon(
+            key: empNotificationKey,
+            notificationType: "Employee",
+          ),
+          NotificationIcon(
+            key: mailNotificationKey,
+            notificationType: "Mail",
+          ),
+          NotificationIcon(
+            key: messNotificationKey,
+            notificationType: "Message",
+          ),
+          NotificationIcon(
+            key: busNotificationKey,
+            notificationType: "Business",
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _notificationBoardTitle = Container(
+    child: Text(
+      "Notifications Board",
+      style: TextStyle(
+        fontFamily: "Lato",
+        fontSize: 22,
+        fontWeight: FontWeight.w500,
+      ),
+    ),
+  );
+
+  Widget _notificationBoard() {
+    return Container(
+      margin: EdgeInsets.only(top: 12),
+      child: CarouselSlider(
+        height: 285.0,
+        items: [0, 1, 2, 3, 4].map((i) {
+          return Builder(
+            builder: (BuildContext context) {
+              return Container(
+                width: MediaQuery.of(context).size.width,
+                margin: EdgeInsets.symmetric(horizontal: 5.0),
+                decoration: BoxDecoration(
+                  color: Colors.cyan,
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  boxShadow: <BoxShadow>[
+                    BoxShadow(
+                      color: Colors.black12,
+                      offset: Offset(2.0, 2.0),
+                    )
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  child: Center(
+                    child: Stack(
+                      children: <Widget>[
+                        Container(
+                          height: 285.0,
+                          child: Image(
+                            image: AssetImage(images[i]),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Container(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: <Widget>[
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    vertical: 20, horizontal: 10),
+                                child: Text(
+                                  "This is a sample text from a notification. This text can be modified with the latest notifications from the app.",
+                                  textAlign: TextAlign.justify,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: "Lato",
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w300,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          );
+        }).toList(),
       ),
     );
   }
