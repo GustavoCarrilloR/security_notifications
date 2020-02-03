@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:security_notifications/screen/notificatoin_screens/general_notification_screen.dart';
+
+import '../notification_list_screen.dart';
 
 class NotificationIcon extends StatefulWidget {
   final String notificationType;
+  final Function onPopUpFun;
   final double iconSize;
 
   const NotificationIcon({
     Key key,
     this.notificationType = "",
     this.iconSize = 40,
+    this.onPopUpFun,
   }) : super(key: key);
 
   @override
@@ -20,13 +23,9 @@ class NotificationIconState extends State<NotificationIcon>
   AnimationController _animationController;
   Animation<double> _animation;
 
-  AnimationController _bellAnimationController;
-  Animation<double> _bellAnimation;
-
   int _notificationQty = 0;
   IconData _iconData = Icons.notifications;
   Color _backgroundColor = Colors.orange;
-  String _notificationTitle = "", _notificationBody = "";
 
   @override
   void initState() {
@@ -34,11 +33,6 @@ class NotificationIconState extends State<NotificationIcon>
     super.initState();
     _animationController = AnimationController(
       duration: Duration(milliseconds: 500),
-      vsync: this,
-    );
-
-    _bellAnimationController = AnimationController(
-      duration: Duration(milliseconds: 200),
       vsync: this,
     );
 
@@ -65,15 +59,9 @@ class NotificationIconState extends State<NotificationIcon>
         break;
       case "Business":
         _iconData = Icons.business;
-        _backgroundColor = Colors.black54;
+        _backgroundColor = Colors.blueGrey;
         break;
     }
-  }
-
-  void setNotificationTitle(
-      {String notificationTitle = "", String notificationBody = ""}) {
-    _notificationTitle = notificationTitle;
-    _notificationBody = notificationBody;
   }
 
   void updateNotification() {
@@ -106,40 +94,20 @@ class NotificationIconState extends State<NotificationIcon>
     _animationController.forward();
   }
 
-  void seeNotification() {
+  void seeNotifications() {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => GeneralNotificationScreen(
-          notificationTitle: _notificationTitle,
-          notificationBody: _notificationBody,
+        builder: (context) => NotificationListScreen(
           notificationType: widget.notificationType,
+          onPopUpFun: widget.onPopUpFun,
         ),
       ),
     );
   }
 
-  void animateBell() {
-    final CurvedAnimation curvedAnimation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.bounceIn,
-      reverseCurve: Curves.easeOut,
-    );
-
-    _bellAnimation = Tween<double>(
-      begin: 0,
-      end: 10,
-    ).animate(curvedAnimation)
-      ..addListener(() {
-        setState(() {});
-      })
-      ..addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          _bellAnimationController.reverse();
-        }
-      });
-
-    _bellAnimationController.forward();
+  void setNotificationsQty(int quantity) {
+    _notificationQty = quantity;
   }
 
   @override
@@ -153,11 +121,7 @@ class NotificationIconState extends State<NotificationIcon>
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if (widget.notificationType == "General") {
-          animateBell();
-        } else {
-          seeNotification();
-        }
+        seeNotifications();
       },
       child: Container(
         child: Stack(
@@ -194,7 +158,7 @@ class NotificationIconState extends State<NotificationIcon>
                           style: TextStyle(
                             fontFamily: "Lato",
                             fontSize: 15,
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.w300,
                           ),
                         ),
                       ),

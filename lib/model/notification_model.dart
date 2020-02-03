@@ -7,38 +7,61 @@ String notificationToJson(NotificationModel data) => json.encode(data.toJson());
 
 class NotificationModel {
   String notificationId;
-  int notificationType;
-  String modelType;
-  String modelId;
-  Map<String, dynamic> extraFields;
+  String notificationType;
+  String notificationTitle;
+  String notificationBody;
+  int status;
+  bool seen;
 
   NotificationModel({
-    this.notificationId,
-    this.notificationType,
-    this.modelType,
-    this.modelId,
-    this.extraFields,
+    this.notificationId = "",
+    this.notificationType = "",
+    this.notificationTitle = "",
+    this.notificationBody = "",
+    this.status = 1,
+    this.seen = false,
   });
 
-  factory NotificationModel.fromJson(Map<String, dynamic> json) => NotificationModel(
+  factory NotificationModel.fromJson(Map<String, dynamic> json) =>
+      NotificationModel(
         notificationId: json["notificationId"],
         notificationType: json["notificationType"],
-        modelType: json["modelType"],
-        modelId: json["modelId"],
-        extraFields: json["extraFields"],
+        notificationTitle: json["notificationTitle"],
+        notificationBody: json["notificationBody"],
       );
 
   Map<String, dynamic> toJson() => {
         "notificationId": notificationId,
         "notificationType": notificationType,
-        "modelType": modelType,
-        "modelId": modelId,
-        "extraFields": extraFields,
+        "notificationTitle": notificationTitle,
+        "notificationBody": notificationBody,
+        "status": status,
+        "seen": seen,
       };
 
-  bool validNotification(NotificationModel notification) =>
-      (notification.notificationId != null &&
-          notification.notificationType != null &&
-          notification.modelId != null &&
-          notification.modelType != null);
+  factory NotificationModel.fromMap(Map<String, dynamic> map) =>
+      NotificationModel(
+        notificationId: map["notificationId"],
+        notificationType: map["notificationType"],
+        notificationTitle: map["notificationTitle"],
+        notificationBody: map["notificationBody"],
+        seen: map["seen"] == 1,
+        status: 1,
+      );
+
+  Map<String, dynamic> toMap() => {
+        "notificationId": notificationId,
+        "notificationType": notificationType,
+        "notificationTitle": notificationTitle,
+        "notificationBody": notificationBody,
+        "seen": seen ? 1 : 0,
+        "status": status,
+      };
+
+  static bool validate(NotificationModel notificationModel) {
+    return notificationModel.notificationId.isNotEmpty &&
+        notificationModel.notificationType.isNotEmpty &&
+        notificationModel.notificationTitle.isNotEmpty &&
+        notificationModel.notificationBody.isNotEmpty;
+  }
 }
